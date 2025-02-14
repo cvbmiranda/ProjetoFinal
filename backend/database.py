@@ -1,61 +1,61 @@
 import sqlite3
 import json
-import os
 
-class Database:
-    def __init__(self):
-        self.conn = sqlite3.connect("usuarios.db", check_same_thread=False)
-        self.cursor = self.conn.cursor()
-        self.criar_tabela()
+DB_NAME = "database.db"
+JSON_FILE = "usuarios.json"
 
-    def criar_tabela(self):
-        self.cursor.execute("""
+def criar_tabela():
+    """Cria a tabela de usuários no banco de dados SQLite se não existir."""
+    conexao = sqlite3.connect(DB_NAME)
+    cursor = conexao.cursor()
+    cursor.execute('''
         CREATE TABLE IF NOT EXISTS usuarios (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             nome TEXT NOT NULL,
             email TEXT NOT NULL UNIQUE,
-            usuario TEXT NOT NULL UNIQUE,
+            username TEXT NOT NULL UNIQUE,
             senha TEXT NOT NULL
         )
-        """)
-        self.conn.commit()
+    ''')
+    conexao.commit()
+    conexao.close()
 
-    def inserir_usuario(self, nome, email, usuario, senha):
-        try:
-            self.cursor.execute("INSERT INTO usuarios (nome, email, usuario, senha) VALUES (?, ?, ?, ?)", 
-                                (nome, email, usuario, senha))
-            self.conn.commit()
+def salvar_usuario(nome, email, username, senha):
+    """Salva um novo usuário no banco de dados e no JSON."""
+    conexao = sqlite3.connect(DB_NAME)
+    cursor = conexao.cursor()
+    try:
+        cursor.execute("INSERT INTO usuarios (nome, email, username, senha) VALUES (?, ?, ?, ?)",
+                       (nome, email, username, senha))
+        conexao.commit()
+    except sqlite3.IntegrityError:
+        return False
+    finally:
+        conexao.close()
+    
+    salvar_em_json()
+    return True
 
-            # Adicionar usuário no arquivo JSON
-            self.salvar_usuario_json(nome, email, usuario)
+def salvar_em_json():
+    """Exporta os usuários do banco de dados para um arquivo JSON."""
+    conexao = sqlite3.connect(DB_NAME)
+    cursor = conexao.cursor()
+    cursor.execute("SELECT id, nome, email, username FROM usuarios")
+    usuarios = cursor.fetchall()
+    conexao.close()
 
-            return True
-        except sqlite3.IntegrityError:
-            return False  # Retorna falso se o usuário ou email já existirem
+    lista_usuarios = [{"id": u[0], "nome": u[1], "email": u[2], "username": u[3]} for u in usuarios]
+    
+    with open(JSON_FILE, "w") as f:
+        json.dump(lista_usuarios, f, indent=4)
 
-    def salvar_usuario_json(self, nome, email, usuario):
-        arquivo_json = "usuarios.json"
-        dados = []
+def listar_usuarios():
+    """Retorna todos os usuários cadastrados no banco de dados."""
+    conexao = sqlite3.connect(DB_NAME)
+    cursor = conexao.cursor()
+    cursor.execute("SELECT id, nome, email, username FROM usuarios")
+    usuarios = cursor.fetchall()
+    conexao.close()
+    return [{"id": u[0], "nome": u[1], "email": u[2], "username": u[3]} for u in usuarios]
 
-        # Se o arquivo já existir, carregamos os dados existentes
-        if os.path.exists(arquivo_json):
-            with open(arquivo_json, "r", encoding="utf-8") as f:
-                try:
-                    dados = json.load(f)
-                except json.JSONDecodeError:
-                    dados = []
-
-        # Adicionamos o novo usuário à lista
-        dados.append({"nome": nome, "email": email, "usuario": usuario})
-
-        # Salvamos no arquivo JSON
-        with open(arquivo_json, "w", encoding="utf-8") as f:
-            json.dump(dados, f, indent=4, ensure_ascii=False)
-
-    def listar_usuarios_json(self):
-        arquivo_json = "usuarios.json"
-        if os.path.exists(arquivo_json):
-            with open(arquivo_json, "r", encoding="utf-8") as f:
-                return json.load(f)
-        return []
-
+criar_tabela()

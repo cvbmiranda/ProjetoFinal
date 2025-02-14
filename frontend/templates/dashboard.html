@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Biblioteca de Jogos</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <h1>Bem-vindo à Biblioteca de Jogos</h1>
+    <p>Escolha um jogo:</p>
+    <ul>
+        <li><a href="#">Jogo da Velha</a></li>
+        <li><a href="#">Batalha Naval</a></li>
+        <li><a href="#">Campo Minado</a></li>
+        <li><a href="#">Pedra, Papel e Tesoura</a></li>
+    </ul>
+    <a href="{{ url_for('home') }}">Sair</a>
+</body>
+</html>

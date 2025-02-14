@@ -1,14 +1,14 @@
 class Usuario:
-    def __init__(self, nome, email, usuario, senha):
+    def __init__(self, nome, email, username, senha):
         self.nome = nome
         self.email = email
-        self.usuario = usuario
-        self.senha = senha
+        self.username = username
+        self.senha = senha  # A senha será armazenada já com hash
 
     def to_dict(self):
-        """Converte os dados do usuário para um dicionário (útil para JSON)."""
+        """Retorna um dicionário representando o usuário (sem a senha)."""
         return {
             "nome": self.nome,
             "email": self.email,
-            "usuario": self.usuario
+            "username": self.username
         }
