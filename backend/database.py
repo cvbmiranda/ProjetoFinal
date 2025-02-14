@@ -26,7 +26,7 @@ def salvar_usuario(nome, email, username, senha):
     cursor = conexao.cursor()
     try:
         cursor.execute("INSERT INTO usuarios (nome, email, username, senha) VALUES (?, ?, ?, ?)",
-                       (nome, email, username, senha))
+                    (nome, email, username, senha))
         conexao.commit()
     except sqlite3.IntegrityError:
         return False
