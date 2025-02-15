@@ -4,6 +4,10 @@ from database import listar_usuarios
 
 routes = Blueprint("routes", __name__)
 
+@routes.route("/", methods=["GET"])
+def home():
+    return jsonify({"mensagem": "Servidor Flask rodando!"})
+
 @routes.route("/register", methods=["POST"])
 def register():
     data = request.json
@@ -25,3 +29,4 @@ def login():
 @routes.route("/users", methods=["GET"])
 def users():
     return jsonify(listar_usuarios()), 200
+
