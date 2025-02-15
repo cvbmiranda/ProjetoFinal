@@ -8,14 +8,17 @@ async def handle_connection(websocket, path):
     try:
         async for mensagem in websocket:
             for conn in conexoes:
-                if conn != websocket:
+                if conn != websocket:  # Evita enviar a mensagem de volta ao remetente
                     await conn.send(mensagem)
     except websockets.exceptions.ConnectionClosed:
         pass
     finally:
         conexoes.remove(websocket)
 
-start_server = websockets.serve(handle_connection, "localhost", 8765)
+async def main():
+    async with websockets.serve(handle_connection, "localhost", 8765):
+        print("Servidor WebSocket rodando em ws://localhost:8765")
+        await asyncio.Future()  # Mantém o servidor rodando indefinidamente
 
-asyncio.get_event_loop().run_until_complete(start_server)
-asyncio.get_event_loop().run_forever()
+if __name__ == "__main__":
+    asyncio.run(main())  # Inicia corretamente o loop no Python 3.12+
