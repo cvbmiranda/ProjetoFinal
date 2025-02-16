@@ -10,9 +10,9 @@ def home():
 def login():
     return render_template('login.html')
 
-@app.route('/register')
+@app.route('/registro')
 def register():
-    return render_template('register.html')
+    return render_template('registro.html')
 
 @app.route('/dashboard')
 def dashboard():
